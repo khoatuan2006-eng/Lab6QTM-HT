@@ -52,17 +52,21 @@ Vì SW1 và SW2 là các thiết bị chuyển mạch Layer 2 (L2 Switch), chún
 
 ---
 
-## 2. Danh sách Công việc cần thực hiện
+## 2. Danh sách Công việc cần thực hiện & Đối chiếu Đề bài
 
-1. Cấu hình các thông số cơ bản (Hostname, MOTD Banner) cho cả 2 Switch.
-2. Cấu hình kết nối Trunking giữa `SW1 ↔ SW2` và `SW1 ↔ R2`.
-3. Cấu hình **VTP (VLAN Trunking Protocol)**: `SW1` làm **VTP Server**, `SW2` làm **VTP Client**.
-4. Khởi tạo các VLAN: `10`, `20`, `30`, `40`, `50` trên `SW1` (sẽ tự động đồng bộ sang `SW2`).
-5. Gán các cổng truy cập (Access Ports) vào các VLAN tương ứng trên cả hai switch theo dải cổng được yêu cầu:
-   - **VLAN 10**: dải cổng từ `e1/0` đến `e1/3`.
-   - **VLAN 20**: dải cổng từ `e2/0` đến `e2/3`.
-   - **VLAN 30**: dải cổng từ `e3/0` đến `e3/3`.
-6. Cấu hình **Spanning-Tree PortFast** trên các cổng Access để tối ưu hóa thời gian nhận DHCP của các máy tính PC.
+Dưới đây là chi tiết công việc chuyển mạch bạn cần thực hiện, đối chiếu chính xác theo các câu yêu cầu trong đề bài:
+
+1. **Cấu hình thông số cơ bản** [👉 *Giải quyết **Yêu cầu 1 & 2***]: Cấu hình hostname (`SW1`, `SW2`) và MOTD Banner chứa thông tin nhóm/thành viên.
+2. **Cấu hình kết nối Trunking giữa SW1 ↔ SW2 & SW1 ↔ R2** [👉 *Giải quyết **Yêu cầu 3 & 7***]: Cấu hình cổng `e0/0` (sang SW2) và `e0/1` (sang R2) ở chế độ Trunking với encapsulation 802.1q.
+3. **Cấu hình VTP (VLAN Trunking Protocol)** [👉 *Giải quyết **Yêu cầu 7***]: 
+   - Cấu hình `SW1` làm **VTP Server** (Domain: `Lab6QTM`, Password: `123`).
+   - Cấu hình `SW2` làm **VTP Client** đồng bộ tự động thông tin VLAN từ SW1.
+4. **Khởi tạo cơ sở dữ liệu VLAN trên SW1** [👉 *Giải quyết **Yêu cầu 3 & 7***]: Tạo VLAN `10`, `20`, `30` (Yêu cầu 3) và VLAN `40`, `50` (Yêu cầu 7) trên `SW1` để tự động đồng bộ sang `SW2`.
+5. **Gán cổng truy cập (Access Ports) vào các VLAN** [👉 *Giải quyết **Yêu cầu 2 & 3***]: Gán dải cổng truy cập tương ứng cho các thiết bị đầu cuối trên cả 2 switch:
+   - **VLAN 10** (`e1/0-3`): Cho cổng nối máy tính PC1.
+   - **VLAN 20** (`e2/0-3`): Cho cổng nối máy tính PC2, PC3.
+   - **VLAN 30** (`e3/0-3`): Cho cổng nối máy tính PC4 (gán trên SW2).
+6. **Cấu hình tối ưu hóa Spanning-Tree PortFast** [👉 *Hỗ trợ **Yêu cầu 5***]: Kích hoạt `spanning-tree portfast` trên tất cả các cổng Access để các PC có thể nhận IP động từ DHCP Server lập tức, tránh lỗi DHCP Timeout do STP chờ đợi 30 giây.
 
 ---
 

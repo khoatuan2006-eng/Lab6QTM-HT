@@ -51,20 +51,17 @@
 
 ---
 
-## 2. Danh sách Công việc cần thực hiện
+## 2. Danh sách Công việc cần thực hiện & Đối chiếu Đề bài
 
-1. Cấu hình Hostname và Banner MOTD cho Router `R2`.
-2. Chia nhỏ cổng vật lý `e0/1` thành các sub-interfaces:
-   - `e0/1.10` cho VLAN 10.
-   - `e0/1.20` cho VLAN 20.
-   - `e0/1.30` cho VLAN 30.
-3. Gán địa chỉ IP Gateway tương ứng cho từng sub-interface và bật cổng vật lý `e0/1`.
-4. Cấu hình IP cho các cổng Point-to-Point nối sang các Router khác:
-   - `e0/0` (Nối sang `R1`): `192.168.100.2/30`.
-   - `e0/2` (Nối sang `R3`): `192.168.100.9/30` (đường dự phòng).
-5. Cấu hình giao thức định tuyến động **OSPF (Process ID 1, Area 0)** trên tất cả các mạng kết nối trực tiếp.
-6. Cấu hình **OSPF Cost** trên interface `e0/2` tăng lên `100` để ép dữ liệu ưu tiên đi qua đường `R2-R1-R3` làm đường chính.
-7. Cấu hình **DHCP Relay Agent (IP Helper-address)** trên sub-interface VLAN 20 và VLAN 30, chuyển hướng các bản tin xin cấp IP đến Router dịch vụ `R3` (IP `192.168.100.10`).
+Dưới đây là chi tiết công việc định tuyến bạn cần thực hiện, đối chiếu chính xác theo các câu yêu cầu trong đề bài:
+
+1. **Cấu hình thông số cơ bản** [👉 *Giải quyết **Yêu cầu 1 & 2***]: Cấu hình hostname (`R2`) và MOTD Banner chứa thông tin nhóm/thành viên.
+2. **Chia nhỏ cổng vật lý thành sub-interfaces (Router-on-Stick)** [👉 *Giải quyết **Yêu cầu 3***]: Chia nhỏ cổng vật lý `e0/1` thành các sub-interfaces ảo: `e0/1.10` cho VLAN 10, `e0/1.20` cho VLAN 20, và `e0/1.30` cho VLAN 30.
+3. **Cấu hình Gateway IP và bật cổng vật lý** [👉 *Giải quyết **Yêu cầu 2 & 3***]: Gán địa chỉ IP Gateway tương ứng cho từng sub-interface (`192.168.10.1/24`, `172.20.0.1/16`, `172.30.0.1/16`) kèm encapsulation `dot1q`, sau đó bật cổng vật lý `e0/1` bằng lệnh `no shutdown`.
+4. **Cấu hình cổng Point-to-Point** [👉 *Giải quyết **Yêu cầu 2***]: Thiết lập IP cho các interface vật lý nối sang các Router lân cận: `e0/0` (sang R1) gán `192.168.100.2/30` và `e0/2` (sang R3) gán `192.168.100.9/30` (đường dự phòng).
+5. **Cấu hình định tuyến động OSPF** [👉 *Giải quyết **Yêu cầu 4***]: Chạy OSPF với Process ID 1, Area 0 và quảng bá toàn bộ dải mạng kết nối trực tiếp (VLAN 10, VLAN 20, VLAN 30, các đường Point-to-Point).
+6. **Điều chỉnh OSPF Cost dự phòng** [👉 *Giải quyết **Yêu cầu 4***]: Thiết lập OSPF Cost bằng `100` trên interface `e0/2` nối sang R3 để ép lưu lượng ưu tiên đi qua đường chính `R2-R1-R3`.
+7. **Cấu hình DHCP Relay Agent (IP Helper-address)** [👉 *Giải quyết **Yêu cầu 5***]: Cấu hình lệnh `ip helper-address 192.168.100.10` trên sub-interface `e0/1.20` và `e0/1.30` để chuyển tiếp gói tin xin cấp IP động tới DHCP Server (R3).
 
 ---
 

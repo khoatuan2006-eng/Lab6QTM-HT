@@ -46,24 +46,20 @@
 
 ---
 
-## 2. Danh sách Công việc cần thực hiện
+## 2. Danh sách Công việc cần thực hiện & Đối chiếu Đề bài
 
-1. Cấu hình Hostname và Banner MOTD cho Router `R3`.
-2. Cấu hình IP các interface:
-   - Cổng `e0/0` (Nối sang `R1`): `192.168.100.6/30` (Đường chính).
-   - Cổng `e0/3` (Nối sang `R2`): `192.168.100.10/30` (Đường dự phòng).
-   - Cổng `e0/1` (Nối xuống Switch DMZ `SW3`): `192.168.1.1/24`.
-3. Cấu hình OSPF (Process ID 1, Area 0) trên cả 3 interface.
-4. **Đặc biệt**: Tăng **OSPF Cost** trên interface `e0/3` lên `100` để khớp với Router R2, tránh hiện tượng định tuyến bất đối xứng (Asymmetric Routing).
-5. Cấu hình **DHCP Server** trên `R3` cấp IP động cho 2 mạng VLAN:
-   - Pool `VLAN20` (`172.20.0.0/16`), gateway `172.20.0.1`.
-   - Pool `VLAN30` (`172.30.0.0/16`), gateway `172.30.0.1`.
-   - Loại trừ các địa chỉ IP của Gateway và địa chỉ IP tĩnh để tránh xung đột.
-6. Cấu hình **DHCP Static Binding (Gán IP tĩnh từ DHCP)**: Đảm bảo máy tính **PC4** (VLAN 30) luôn nhận được địa chỉ IP cố định là **`172.30.0.40`** dựa trên địa chỉ MAC.
-7. Cấu hình **Extended ACL (Access Control List)** trên cổng `e0/1` (hướng ra DMZ) để thực thi 2 yêu cầu bảo mật:
-   - **Yêu cầu 1**: Cấm máy **PC4 (`172.30.0.40`)** truy cập vào bất cứ thiết bị nào trong vùng DMZ (`192.168.1.0/24`).
-   - **Yêu cầu 2**: Cấm mọi thiết bị trong **VLAN 20 (`172.20.0.0/16`)** truy cập Server (`192.168.1.2`) bằng các giao thức khác (như Ping, FTP, SSH), **chỉ cho phép truy cập qua giao thức Web (HTTP-80 và HTTPS-443)**.
-8. Cấu hình tĩnh địa chỉ IP trên Web Server và bật dịch vụ Web (HTTP/HTTPS).
+Dưới đây là chi tiết công việc dịch vụ, bảo mật và cấu hình Server bạn cần thực hiện, đối chiếu chính xác theo các câu yêu cầu trong đề bài:
+
+1. **Cấu hình thông số cơ bản** [👉 *Giải quyết **Yêu cầu 1 & 2***]: Cấu hình hostname (`R3`, `SW3`) và MOTD Banner chứa thông tin nhóm/thành viên.
+2. **Cấu hình IP cho các Interface** [👉 *Giải quyết **Yêu cầu 2***]: Cấu hình địa chỉ IP cho các cổng vật lý trên R3: `e0/0` (nối sang R1) là `192.168.100.6/30`, `e0/3` (nối sang R2) là `192.168.100.10/30`, và `e0/1` (cổng Gateway DMZ) là `192.168.1.1/24`.
+3. **Cấu hình định tuyến động OSPF** [👉 *Giải quyết **Yêu cầu 4***]: Bật định tuyến OSPF Process ID 1, Area 0 trên cả 3 cổng kết nối trực tiếp.
+4. **Đồng bộ OSPF Cost cho đường dự phòng** [👉 *Giải quyết **Yêu cầu 4***]: Thiết lập lệnh `ip ospf cost 100` trên interface `e0/3` để đồng bộ cấu hình với Router R2 ở đầu kia, tránh định tuyến bất đối xứng.
+5. **Cấu hình DHCP Server cấp IP động** [👉 *Giải quyết **Yêu cầu 5***]: Thiết lập 2 DHCP Pools (`VLAN20` và `VLAN30`) trên R3 để tự động cấp IP cho các PC thuộc VLAN 20 và VLAN 30 thông qua DHCP Relay.
+6. **Cấu hình DHCP Static Binding (gán MAC cố định)** [👉 *Giải quyết **Yêu cầu 5***]: Cấu hình IP tĩnh dành riêng (`172.30.0.40/16`) trong DHCP Pool tương ứng với MAC Address của máy **PC4** để đảm bảo PC4 luôn nhận đúng địa chỉ IP này.
+7. **Cấu hình Extended Access Control List (ACL)** [👉 *Giải quyết **Yêu cầu 8 & 9***]: Thiết lập bộ lọc bảo mật `DMZ_SECURITY` trên cổng `e0/1` (hướng OUT ra DMZ):
+   - Cấm host **PC4 (`172.30.0.40`)** truy cập vào bất cứ tài nguyên nào thuộc DMZ (`192.168.1.0/24`) [👉 *Giải quyết **Yêu cầu 8***].
+   - Chỉ cho phép VLAN 20 (`172.20.0.0/16`) truy cập Web Server (`192.168.1.2`) bằng giao thức HTTP/HTTPS (port 80/443), cấm tất cả các giao thức khác như ping, ftp, ssh [👉 *Giải quyết **Yêu cầu 9***].
+8. **Cấu hình IP và Dịch vụ Web Server** [👉 *Giải quyết **Yêu cầu 2 & 9***]: Cấu hình IP tĩnh `192.168.1.2/24` cho Web Server và bật các dịch vụ HTTP/HTTPS trên Server để chạy trang Web.
 
 ---
 

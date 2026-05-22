@@ -37,19 +37,21 @@
 
 ---
 
-## 2. Danh sách Công việc cần thực hiện
+## 2. Danh sách Công việc cần thực hiện & Đối chiếu Đề bài
 
-1. Cấu hình Hostname và Banner MOTD cho Router `R1`.
-2. Cấu hình IP và phân định biên dịch NAT trên các interface:
-   - Cổng `e0/0` (Nối ra ISP): Nhận IP động qua DHCP hoặc đặt IP tĩnh `100.100.100.1/24` theo đề bài. Cấu hình cổng này làm **`ip nat outside`**.
-   - Cổng `e0/1` (Nối sang `R2`): `192.168.100.1/30`. Cấu hình làm **`ip nat inside`**.
-   - Cổng `e0/2` (Nối sang `R3`): `192.168.100.5/30`. Cấu hình làm **`ip nat inside`**.
-3. Cấu hình Default Route (`0.0.0.0/0`) hướng ra ngoài Internet thông qua cổng `e0/0`.
-4. Cấu hình **OSPF (Process ID 1, Area 0)** trên 2 cổng kết nối nội bộ (`e0/1` và `e0/2`).
-5. **Đặc biệt**: Sử dụng lệnh **`default-information originate`** trong OSPF để quảng bá Default Route cho `R2` và `R3` tự động học được.
-6. Cấu hình **NAT Overload (PAT)**: Cho phép các thiết bị từ VLAN 10 và VLAN 20 truy cập Internet, **cấm hoàn toàn VLAN 30 ra Internet**.
-7. Cấu hình **Static NAT (Port Forwarding)**: Cho phép thiết bị Client từ Internet truy cập dịch vụ Web của Server trong DMZ (`192.168.1.2`) qua cổng Public của R1.
-8. Cấu hình bảo mật quản trị: Chỉ cho phép các thiết bị thuộc **VLAN 10 (`192.168.10.0/24`)** được phép **Telnet** vào quản trị Router `R1`.
+Dưới đây là chi tiết công việc định tuyến, NAT và bảo mật bạn cần thực hiện, đối chiếu chính xác theo các câu yêu cầu trong đề bài:
+
+1. **Cấu hình thông số cơ bản** [👉 *Giải quyết **Yêu cầu 1 & 2***]: Cấu hình hostname (`R1`) và MOTD Banner chứa thông tin nhóm/thành viên.
+2. **Cấu hình IP và phân vùng NAT trên các cổng** [👉 *Giải quyết **Yêu cầu 2 & 6***]:
+   - Cổng `e0/0` (ISP): Nhận IP qua DHCP (hoặc đặt IP tĩnh `100.100.100.1/24`). Gán lệnh **`ip nat outside`**.
+   - Cổng `e0/1` (nối sang `R2`): Đặt IP `192.168.100.1/30`. Gán lệnh **`ip nat inside`**.
+   - Cổng `e0/2` (nối sang `R3`): Đặt IP `192.168.100.5/30`. Gán lệnh **`ip nat inside`**.
+3. **Cấu hình Default Route hướng ra Internet** [👉 *Giải quyết **Yêu cầu 6***]: Định tuyến tĩnh mặc định (`ip route 0.0.0.0 0.0.0.0 e0/0`) để trỏ luồng dữ liệu ra ISP.
+4. **Cấu hình định tuyến động OSPF** [👉 *Giải quyết **Yêu cầu 4***]: Chạy OSPF Process ID 1, Area 0 trên các cổng kết nối nội bộ (`e0/1` và `e0/2`).
+5. **Tự động quảng bá Default Route** [👉 *Hỗ trợ **Yêu cầu 6***]: Sử dụng lệnh **`default-information originate`** trong OSPF để quảng bá tuyến đường ra Internet cho R2 và R3 tự động học được.
+6. **Cấu hình NAT Overload (PAT) chặn VLAN 30** [👉 *Giải quyết **Yêu cầu 6 & 11***]: Tạo Access-List 10 chỉ cho phép VLAN 10 và VLAN 20 kết nối Internet qua NAT Overload; loại bỏ hoàn toàn dải mạng VLAN 30 (`172.30.0.0/16`) để cấm VLAN 30 ra Internet.
+7. **Cấu hình Static NAT (Port Forwarding)** [👉 *Giải quyết **Yêu cầu 12***]: Ánh xạ cổng dịch vụ Web (TCP 80 & TCP 443) từ Web Server nội bộ (`192.168.1.2`) ra cổng IP Public của R1 để cho phép Client từ Internet truy cập.
+8. **Cấu hình giới hạn truy cập Telnet** [👉 *Giải quyết **Yêu cầu 10***]: Tạo Access-List 20 chỉ cho phép dải mạng VLAN 10 (`192.168.10.0/24`) và áp dụng `access-class 20 in` trên cổng VTY để giới hạn quyền Telnet vào Router R1.
 
 ---
 
