@@ -100,6 +100,25 @@ Hệ thống được chia nhỏ thành 4 phân vùng độc lập để tránh 
 | **Thành viên 3** | **Gateway & NAT Specialist**| R1 | - `e0/0` (Nối ISP): DHCP (Public IP)<br>- `e0/1` (Nối R2): `192.168.100.1/30`<br>- `e0/2` (Nối R3): `192.168.100.5/30` | [thanh_vien_3_gateway_nat.md](file:///d:/Lab6QTM/thanh_vien_3_gateway_nat.md) |
 | **Thành viên 4** | **Services & Security** | R3, SW3, Server | - **R3** `e0/0` (Nối R1): `192.168.100.6/30`<br>- **R3** `e0/3` (Nối R2): `192.168.100.10/30`<br>- **R3** `e0/1` (Gateway DMZ): `192.168.1.1/24`<br>- **Server** (Web Server): `192.168.1.2/24` | [thanh_vien_4_services_security.md](file:///d:/Lab6QTM/thanh_vien_4_services_security.md) |
 
+### 3.1 Bản đồ Đối chiếu Nhiệm vụ Theo 12 Yêu cầu của Đề bài
+
+Để đảm bảo không bỏ sót bất kỳ yêu cầu nào của giáo viên, dưới đây là bảng ánh xạ chi tiết 12 yêu cầu trong đề bài vào nhiệm vụ của từng thành viên:
+
+| Số yêu cầu | Nội dung yêu cầu | Thành viên chịu trách nhiệm | Cách giải quyết kỹ thuật | Tài liệu hướng dẫn chi tiết |
+|---|---|---|---|---|
+| **Yêu cầu 1** | Cấu hình Hostname & MOTD Banner nhóm | **Cả 4 thành viên** | Thực hiện trên các thiết bị mình phụ trách (`SW1`, `SW2`, `R2`, `R1`, `R3`, `SW3`). | Có trong hướng dẫn của từng thành viên |
+| **Yêu cầu 2** | Đặt IP (tĩnh/động) cho PC, Router, Server, Client | **Cả 4 thành viên** | Cấu hình IP tĩnh cho `PC1` & `Server`, IP động cho `PC2`, `PC3`, `PC4`, và IP cổng WAN/LAN của các Router. | [README.md (IP Table)](#2-bang-phan-bo-dia-chi-ip-toan-he-thong) |
+| **Yêu cầu 3** | SW1 tạo VLAN 10,20,30. R2 chia sub-interfaces. Trunk SW1-R2 & Router-on-stick | **Thành viên 1 & 2** | - **TV 1**: Tạo VLAN 10,20,30 trên SW1 và cấu hình Trunking cổng `e0/1`. <br>- **TV 2**: Cấu hình sub-interfaces `e0/1.10`, `.20`, `.30` kèm encapsulation `dot1q` trên R2. | [TV 1 (Mục 3)](file:///d:/Lab6QTM/thanh_vien_1_switching.md)<br>[TV 2 (Mục 3)](file:///d:/Lab6QTM/thanh_vien_2_core_routing.md) |
+| **Yêu cầu 4** | Định tuyến động OSPF. Ưu tiên đường R2-R1-R3, link R2-R3 dự phòng | **Thành viên 2 & 4** | Cấu hình OSPF Area 0 trên R1, R2, R3. Thiết lập **`ip ospf cost 100`** trên cả hai đầu link R2-R3 (`e0/2` của R2 và `e0/3` của R3) để ép dữ liệu đi đường R1. | [TV 2 (Mục 3)](file:///d:/Lab6QTM/thanh_vien_2_core_routing.md)<br>[TV 4 (Mục 3)](file:///d:/Lab6QTM/thanh_vien_4_services_security.md) |
+| **Yêu cầu 5** | R3 làm DHCP Server cho VLAN 20,30. DHCP Relay trên R2. PC4 nhận IP `.40` cố định | **Thành viên 2 & 4** | - **TV 2**: Bật `ip helper-address 192.168.100.10` trên sub-interface R2. <br>- **TV 4**: Cấu hình DHCP Pools trên R3, tạo pool tĩnh riêng khớp MAC của PC4 để cấp đúng `.40`. | [TV 2 (Mục 3)](file:///d:/Lab6QTM/thanh_vien_2_core_routing.md)<br>[TV 4 (Mục 3)](file:///d:/Lab6QTM/thanh_vien_4_services_security.md) |
+| **Yêu cầu 6** | Cấu hình NAT Overload trên R1. Đảm bảo toàn mạng ping được Internet (8.8.8.8) | **Thành viên 3** | Cấu hình `ip nat inside/outside` trên R1. Tạo ACL 10 để PAT ra cổng `e0/0`. Bật lệnh quảng bá định tuyến `default-information originate` trong OSPF. | [TV 3 (Mục 3)](file:///d:/Lab6QTM/thanh_vien_3_gateway_nat.md) |
+| **Yêu cầu 7** | Cấu hình SW1-SW2 Trunking. VTP domain/password đồng bộ tự động. Tạo VLAN 40,50 | **Thành viên 1** | Cấu hình Trunking trên SW1-SW2 cổng `e0/0`. Cấu hình VTP Server (`SW1`) và Client (`SW2`). Tạo VLAN 40, 50 trên SW1 để tự động đồng bộ sang SW2. | [TV 1 (Mục 3)](file:///d:/Lab6QTM/thanh_vien_1_switching.md) |
+| **Yêu cầu 8** | ACL cấm PC4 (`172.30.0.40`) truy cập vùng DMZ | **Thành viên 4** | Tạo Extended ACL `DMZ_SECURITY` trên R3, cấu hình luật: `deny ip host 172.30.0.40 192.168.1.0 0.0.0.255` và áp dụng outbound trên `e0/1`. | [TV 4 (Mục 3)](file:///d:/Lab6QTM/thanh_vien_4_services_security.md) |
+| **Yêu cầu 9** | VLAN 20 chỉ được phép truy cập Web Server bằng giao thức HTTP/HTTPS | **Thành viên 4** | Thêm luật vào ACL `DMZ_SECURITY` trên R3: cho phép TCP port 80/443 từ VLAN 20 đến Server `192.168.1.2`, sau đó cấm toàn bộ giao thức IP khác. | [TV 4 (Mục 3)](file:///d:/Lab6QTM/thanh_vien_4_services_security.md) |
+| **Yêu cầu 10** | R1 chỉ cho phép truy cập Telnet từ mạng VLAN 10 | **Thành viên 3** | Tạo ACL 20 trên R1 chỉ `permit 192.168.10.0 0.0.0.255`. Cấu hình cổng VTY Telnet trên R1 và áp dụng lệnh `access-class 20 in`. | [TV 3 (Mục 3)](file:///d:/Lab6QTM/thanh_vien_3_gateway_nat.md) |
+| **Yêu cầu 11** | Cấm VLAN 30 truy cập Internet | **Thành viên 3** | Loại trừ dải mạng VLAN 30 (`172.30.0.0/16`) khỏi Access-List 10 dùng cho NAT Overload trên R1. | [TV 3 (Mục 3)](file:///d:/Lab6QTM/thanh_vien_3_gateway_nat.md) |
+| **Yêu cầu 12** | Client từ Internet truy cập Web Server bằng Static NAT | **Thành viên 3** | Cấu hình Static Port Forwarding trên R1: Ánh xạ cổng TCP 80/443 của Server `192.168.1.2` ra cổng Public của R1. | [TV 3 (Mục 3)](file:///d:/Lab6QTM/thanh_vien_3_gateway_nat.md) |
+
 ---
 
 ## 4. Quy tắc phối hợp làm việc trên Packet Tracer Online
